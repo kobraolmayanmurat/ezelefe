@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Yeter Ali Oyunu</title>
+<style>
+  body {
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+    text-align: center;
+    background-color: #222;
+    color: white;
+    overflow-x: hidden;
+  }
+  #start-screen, #game-screen, #interlude-screen, #end-screen {
+    display: none;
+  }
+  #start-screen {
+    display: block;
+    position: relative;
+  }
+  #start-screen img {
+    width: 300px;
+    cursor: pointer;
+  }
+  #start-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 40px;
+    font-weight: bold;
+    color: yellow;
+    pointer-events: none;
+  }
+  .question {
+    margin: 50px 0;
+    font-size: 28px;
+    font-weight: bold;
+  }
+  .option-btn {
+    display: inline-block;
+    margin: 20px;
+    padding: 15px 30px;
+    font-size: 20px;
+    cursor: pointer;
+    background-color: #00008B; /* Koyu lacivert */
+    color: white;
+    border: none;
+    border-radius: 10px;
+    transition: background-color 0.3s;
+  }
+  .option-btn:hover {
+    background-color: #0000CD; /* Hover için daha açık lacivert */
+  }
+  /* Bitiş ekranı hareketli görsel */
+  #end-image {
+    width: 200px;
+    position: absolute;
+    top: 50%;
+    left: 0;
+    transform: translateY(-50%);
+    animation: moveImage 3s infinite alternate;
+  }
+  @keyframes moveImage {
+    0% { left: 0; }
+    50% { left: 50%; }
+    100% { left: 90%; }
+  }
+  /* Ara ekran görseli */
+  #interlude-screen img {
+    width: 400px;
+    margin-top: 50px;
+  }
+</style>
+</head>
+<body>
+
+<!-- Başlangıç ekranı -->
+<div id="start-screen">
+  <img src="start.png" id="start-btn" alt="Start">
+  <div id="start-text">EZEL EFE</div>
+</div>
+
+<!-- Oyun ekranı -->
+<div id="game-screen">
+  <div class="question" id="question-text">Hangi Ezel Efe sorumsuzluğu?</div>
+  <button class="option-btn" id="option1"></button>
+  <button class="option-btn" id="option2"></button>
+</div>
+
+<!-- Ara ekran -->
+<div id="interlude-screen">
+  <img src="ara.png" alt="Ara Görsel">
+</div>
+
+<!-- Bitiş ekranı -->
+<div id="end-screen">
+  <h1 style="background: linear-gradient(to right, yellow, red); -webkit-background-clip: text; color: transparent; font-size: 50px;">
+    KIRMA EZEL ANAL BAGIMLISI EFE
+  </h1>
+  <p style="font-size: 24px;">Yeni rezilliklerde görüşmek üzere</p>
+  <button onclick="location.reload()" class="option-btn">Tekrar Oyna</button>
+  <img id="end-image" src="son.png" alt="Hareketli Görsel">
+</div>
+
+<!-- Ses dosyası -->
+<audio id="end-sound" src="son.mp3"></audio>
+
+<script>
+  const totalStages = 10;
+  let currentStage = 0;
+  let lastChoice = null;
+
+  const dynamicOptions = [
+    "cold brew süzmeyi unutması", "dümenden mop atması", "kumar bağımlılığı yüzünden shift değiştirmesi", "anal düşkünlüğü", "sürekli venty'e gitmesi",
+    "filtre'ye ceylan gibi sekerek gitmesi", "kırık sandalyeleri görmemesi", "genç kızların kabusu olması", "işe geç kalıp dümenden pardon demesi", "sürekli tatile çıkması",
+    "işe kendi aldığı kızı 2 saatte kovması", "bütün sabah shiftlerine çökmesi"
+  ];
+
+  const startBtn = document.getElementById('start-btn');
+  const startScreen = document.getElementById('start-screen');
+  const gameScreen = document.getElementById('game-screen');
+  const interludeScreen = document.getElementById('interlude-screen');
+  const endScreen = document.getElementById('end-screen');
+  const endSound = document.getElementById('end-sound');
+
+  const option1 = document.getElementById('option1');
+  const option2 = document.getElementById('option2');
+
+  startBtn.addEventListener('click', () => {
+    startScreen.style.display = 'none';
+    gameScreen.style.display = 'block';
+    showOptions();
+  });
+
+  function getRandomOption() {
+    const index = Math.floor(Math.random() * dynamicOptions.length);
+    return dynamicOptions[index];
+  }
+
+  function showOptions() {
+    if (currentStage >= totalStages) {
+      gameScreen.style.display = 'none';
+      endScreen.style.display = 'block';
+      endSound.play();
+      return;
+    }
+
+    if (lastChoice !== null) {
+      option1.textContent = lastChoice;
+      let newOption;
+      do {
+        newOption = getRandomOption();
+      } while (newOption === lastChoice);
+      option2.textContent = newOption;
+    } else {
+      option1.textContent = getRandomOption();
+      option2.textContent = getRandomOption();
+      while(option2.textContent === option1.textContent) {
+        option2.textContent = getRandomOption();
+      }
+    }
+  }
+
+  function handleChoice(choice) {
+    lastChoice = choice;
+    currentStage++;
+
+    // 4. sorudan sonra ara ekran göster
+    if (currentStage === 4) {
+      gameScreen.style.display = 'none';
+      interludeScreen.style.display = 'block';
+      setTimeout(() => {
+        interludeScreen.style.display = 'none';
+        gameScreen.style.display = 'block';
+        showOptions();
+      }, 3000); // 3 saniye
+    } else {
+      showOptions();
+    }
+  }
+
+  option1.addEventListener('click', () => handleChoice(option1.textContent));
+  option2.addEventListener('click', () => handleChoice(option2.textContent));
+
+</script>
+
+</body>
+</html>
